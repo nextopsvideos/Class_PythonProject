@@ -1,0 +1,18 @@
+[project]
+name = "fastapi_app"
+version = "1.0.0"
+description = "Create a restaurants review app with FastAPI and PostgreSQL"
+dependencies = [
+    "azure-monitor-opentelemetry",
+    "fastapi",
+    "jinja2",
+    "uvicorn[standard]",
+    "uvicorn-worker",
+    "python-multipart",
+    "psycopg2",
+    "sqlmodel",
+]
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"

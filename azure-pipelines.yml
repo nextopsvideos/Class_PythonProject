@@ -1,0 +1,68 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: Build 
+  displayName: Build Stage 
+  jobs:
+  - job: BuildJob 
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.12'
+        addToPath: true
+        architecture: 'x64' 
+    
+    - script: |
+        set -e
+        python3 -m venv .venv
+        . .venv/bin/activate
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r src/requirements.txt
+        python3 -m pip install -e src
+      workingDirectory: $(System.DefaultWorkingDirectory)
+      displayName: "Install requirements"
+      
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: '$(system.defaultworkingdirectory)'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        replaceExistingArchive: true
+    
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+- stage: Deploy
+  displayName: 'Deploy to WebbApp'
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - deployment: DeploymentJob
+    environment: 'nextopspyapp'
+    strategy:
+      runOnce:
+       deploy:
+         steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.12'
+              addToPath: true
+              architecture: 'x64'
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: 'Pay-As-You-Go(a355c32e-4a22-4b05-aab4-be236850fa6e)'
+              appType: 'webAppLinux'
+              appName: 'nextopspyapp'
+              package: '$(pipeline.workspace)/drop/$(build.buildId).zip'
+              runtimeStack: 'PYTHON|3.12'
+              startUpCommand: 'src/entrypoint.sh'
+              appSettings: '-AZURE_POSTGRESQL_CONNECTIONSTRING "host=nextopspgs01.postgres.database.azure.com port=5432 dbname=postgres user=sqladmin password=P2ssw0rd@123 sslmode=require"'
+           
