@@ -64,5 +64,5 @@ stages:
               package: '$(pipeline.workspace)/drop/$(build.buildId).zip'
               runtimeStack: 'PYTHON|3.12'
               startUpCommand: 'src/entrypoint.sh'
-              appSettings: '-AZURE_POSTGRESQL_CONNECTIONSTRING "host=nextopspgs01.postgres.database.azure.com port=5432 dbname=postgres user=sqladmin password=P2ssw0rd@123 sslmode=require"'
+              appSettings: '-AZURE_POSTGRESQL_CONNECTIONSTRING "host=pgsrv_fqdn port=5432 dbname=postgres user=username password=password sslmode=require"'
            
