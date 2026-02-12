@@ -58,11 +58,11 @@ stages:
               architecture: 'x64'
           - task: AzureWebApp@1
             inputs:
-              azureSubscription: 'Pay-As-You-Go(a355c32e-4a22-4b05-aab4-be236850fa6e)'
+              azureSubscription: 'Pay-As-You-Go(1)(a355c32e-4a22-4b05-aab4-be236850fa6e)'
               appType: 'webAppLinux'
-              appName: 'nextopspyapp'
+              appName: 'nextopspywat31'
               package: '$(pipeline.workspace)/drop/$(build.buildId).zip'
               runtimeStack: 'PYTHON|3.12'
               startUpCommand: 'src/entrypoint.sh'
-              appSettings: '-AZURE_POSTGRESQL_CONNECTIONSTRING "host=pgsrv_fqdn port=5432 dbname=postgres user=username password=password sslmode=require"'
+              appSettings: '-AZURE_POSTGRESQL_CONNECTIONSTRING "host=nextopspgt31.postgres.database.azure.com port=5432 dbname=postgres user=sqladmin password=P2ssw0rd@123 sslmode=require"'
            
