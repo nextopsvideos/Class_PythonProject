@@ -1,53 +1,80 @@
----
-page_type: sample
-languages:
-- azdeveloper
-- python
-- bicep
-- html
-- css
-- scss
-products:
-- azure
-- azure-app-service
-- azure-postgresql
-- azure-virtual-network
-urlFragment: msdocs-fastapi-postgresql-sample-app
-name: Deploy FastAPI application with PostgreSQL on Azure App Service (Python)
-description: This project deploys a restaurant review web application using FastAPI with Python and Azure Database for PostgreSQL - Flexible Server. It's set up for easy deployment with the Azure Developer CLI.
----
-<!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
+# FastAPI Restaurant Review App
 
-# Deploy FastAPI application with PostgreSQL via Azure App Service
+A simple restaurant review web application built with FastAPI and PostgreSQL.
 
-This project deploys a web application for a restaurnant review site using FastAPI. The application can be deployed to Azure with Azure App Service using the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview).
+## Environment & Versions
 
+- **Python**: 3.12.13
+- **FastAPI**: 0.111.1
+- **PostgreSQL**: Azure Database for PostgreSQL (Flexible Server)
+- **Server**: Gunicorn with Uvicorn worker
+- **Runtime**: Linux (Ubuntu)
 
-## Run the sample
+## Quick Start - Local Development
 
-This project has a [dev container configuration](.devcontainer/), which makes it easier to develop apps locally, deploy them to Azure, and monitor them. The easiest way to run this sample application is inside a GitHub codespace. Follow these steps:
+### Prerequisites
+- Python 3.12+
+- PostgreSQL 14+
+- pip / virtualenv
 
-1. Fork this repository to your account. For instructions, see [Fork a repo](https://docs.github.com/get-started/quickstart/fork-a-repo).
+### Setup
 
-1. From the repository root of your fork, select **Code** > **Codespaces** > **+**.
+```shell
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-1. In the codespace terminal, run the following commands:
+# Install dependencies
+pip install -r src/requirements.txt
+pip install -e src
 
-    ```shell
-    # Create .env with environment variables
-    cp .env.sample.devcontainer .env
+# Set environment variables (create .env file)
+export DBHOST=localhost
+export DBNAME=restaurants
+export DBUSER=postgres
+export DBPASS=<your_password>
 
-    # Install requirements
-    python3 -m pip install -r src/requirements.txt
+# Initialize database
+python3 src/fastapi_app/seed_data.py
 
-    # Install the app as an editable package
-    python3 -m pip install -e src
+# Start dev server
+python3 -m uvicorn fastapi_app:app --reload --port=8000
+```
 
-    # Run database migrations
-    python3 src/fastapi_app/seed_data.py
+Visit `http://localhost:8000` in your browser.
 
-    # Start the development server
-    python3 -m uvicorn fastapi_app:app --reload --port=8000
+## Azure Deployment
+
+Deployed via Azure Pipelines to:
+- **App Service**: Linux Web App (Python 3.12)
+- **Database**: Azure Database for PostgreSQL (Flexible Server)
+- **Region**: East US
+
+### Required Environment Variables (App Settings)
+
+```
+AZURE_POSTGRESQL_CONNECTIONSTRING=host=<host>.postgres.database.azure.com port=5432 dbname=<db> user=<user> password=<password> sslmode=require
+APPLICATIONINSIGHTS_CONNECTION_STRING=<if using Application Insights>
+```
+
+## Project Structure
+
+```
+src/
+├── fastapi_app/
+│   ├── app.py              # FastAPI application
+│   ├── models.py           # Database models (Restaurant, Review)
+│   └── seed_data.py        # Database initialization
+├── requirements.txt        # Dependencies
+├── gunicorn.conf.py        # Gunicorn configuration
+└── entrypoint.sh          # Startup script
+```
+
+## Notes
+
+- Database connection string automatically detected from `AZURE_POSTGRESQL_CONNECTIONSTRING` or individual `DB_*` environment variables
+- SSL mode set to `require` for secure database connections
+- Seed data script handles gracefully if database is unavailable at startup
     ```
 
 1. When you see the message `Your application running on port 8000 is available.`, click **Open in Browser**.
