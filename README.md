@@ -14,7 +14,7 @@ A simple restaurant review web application built with FastAPI and PostgreSQL.
 
 ### Prerequisites
 - Python 3.12+
-- PostgreSQL 14+
+- PostgreSQL 12+
 - pip / virtualenv
 
 ### Setup
