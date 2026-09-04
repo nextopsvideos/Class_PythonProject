@@ -24,7 +24,7 @@ resource "azurerm_linux_web_app" "web" {
   site_config {
     app_command_line = "src/entrypoint.sh"
     application_stack {
-      python_version = "3.11"
+      python_version = "3.12"
     }
   }
 
